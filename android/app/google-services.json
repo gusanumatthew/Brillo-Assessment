@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "273562752607",
+    "project_id": "brillo-f22a3",
+    "storage_bucket": "brillo-f22a3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273562752607:android:fa48fa687b97ba3b1c6dea",
+        "android_client_info": {
+          "package_name": "com.example.brilloconnetz_test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273562752607-m22bo08o3i27cqonoe8l7r04ffa8mhmo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEhrKeTEfXKSjwGmlEa7iEZlPgMLNGEZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273562752607-m22bo08o3i27cqonoe8l7r04ffa8mhmo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
