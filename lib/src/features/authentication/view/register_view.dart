@@ -1,12 +1,20 @@
+import 'package:brilloconnetz_test/src/core/constants/colors.dart';
 import 'package:brilloconnetz_test/src/core/constants/strings.dart';
 import 'package:brilloconnetz_test/src/core/routes.dart';
+import 'package:brilloconnetz_test/src/core/utils/enums.dart';
 import 'package:brilloconnetz_test/src/core/utils/validation_extensions.dart';
+import 'package:brilloconnetz_test/src/features/authentication/model/interest_model.dart';
+import 'package:brilloconnetz_test/src/features/authentication/model/register_params.dart';
+import 'package:brilloconnetz_test/src/features/authentication/view_model/register_notifier.dart';
 import 'package:brilloconnetz_test/src/general_widgets/app_button.dart';
 import 'package:brilloconnetz_test/src/general_widgets/app_text_field.dart';
+import 'package:brilloconnetz_test/src/general_widgets/interest_tile.dart';
 import 'package:brilloconnetz_test/src/general_widgets/spacing.dart';
 import 'package:brilloconnetz_test/src/general_widgets/two_colored_text.dart';
+import 'package:brilloconnetz_test/src/services/snackbar_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RegisterView extends ConsumerStatefulWidget {
@@ -17,19 +25,28 @@ class RegisterView extends ConsumerStatefulWidget {
 }
 
 class RegisterViewState extends ConsumerState<RegisterView> {
+  late Box<Interest> interestBox;
   final _formKey = GlobalKey<FormState>();
   final name = TextEditingController();
   final email = TextEditingController();
   final password = TextEditingController();
   final phone = TextEditingController();
+  bool isEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    interestBox = Hive.box<Interest>('interestBox');
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final height = MediaQuery.of(context).size.height;
-    // final state = ref.watch(registerProvider);
-    // final notifier = ref.read(registerProvider.notifier);
+    final state = ref.watch(registerProvider);
+    final notifier = ref.read(registerProvider.notifier);
+    final snack = ref.read(snackbarService);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -39,7 +56,7 @@ class RegisterViewState extends ConsumerState<RegisterView> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Spacing.height(height * 0.15),
+                // Spacing.height(height * 0.01),
                 const Hero(
                   tag: "Brillo",
                   child: TwoColoredText(
@@ -48,17 +65,16 @@ class RegisterViewState extends ConsumerState<RegisterView> {
                     fontSize: 28,
                   ),
                 ),
-                const Spacing.largeHeight(),
-                const Spacing.largeHeight(),
+                const Spacing.bigHeight(),
                 Text(
                   'Sign up',
                   style: textTheme.headline3,
                 ),
-                const Spacing.largeHeight(),
+                const Spacing.bigHeight(),
                 Form(
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   onChanged: () => setState(() {
-                    _formKey.currentState!.validate();
+                    isEnabled = _formKey.currentState!.validate();
                   }),
                   key: _formKey,
                   child: Column(
@@ -88,42 +104,65 @@ class RegisterViewState extends ConsumerState<RegisterView> {
                         hintText: '09064081032',
                         keyboardType: TextInputType.phone,
                         validateFunction: (value) =>
-                            context.validateEmailAddress(value, context),
+                            context.validatePhone(value, context),
                         controller: phone,
+                      ),
+                      const Spacing.bigHeight(),
+                      Text(
+                        'Interests',
+                        style: textTheme.headline4?.copyWith(
+                          color: AppColors.dark,
+                        ),
+                      ),
+                      const Spacing.smallHeight(),
+                      SizedBox(
+                        child: Wrap(
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: interests
+                              .map(
+                                (model) => GestureDetector(
+                                  onTap: () {
+                                    notifier.updateSelectedInterest(model.id);
+                                    interestBox.put(model.id, model);
+                                  },
+                                  child: InterestTile(
+                                    model: model,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
                       const Spacing.bigHeight(),
                       AppTextField(
                         label: 'Password',
                         hintText: '*******',
-                        // obscureText: state.obscureText,
                         validateFunction: (value) =>
                             context.validatePassword(value, context),
                         controller: password,
-                        // suffixIcon: IconButton(
-                        //   color: AppColors.deep,
-                        //   icon: Icon(
-                        //     state.obscureText
-                        //         ? Icons.visibility_off_outlined
-                        //         : Icons.visibility_outlined,
-                        //   ),
-                        //   onPressed: () => notifier.passwordVisibility(),
-                        // ),
                       ),
-                      const Spacing.largeHeight(),
+                      const Spacing.bigHeight(),
                       AppButton(
                           text: 'Sign up',
-                          //isLoading: state.isLoading,
-                          onTap: () async {
-                            Navigator.pushNamed(context, Routes.dashboard);
-                            FocusScope.of(context).unfocus();
-                            // if (_formKey.currentState!.validate()) {
-                            //   await notifier.registerUser(
-                            //       email: email.text,
-                            //       password: password.text,
-                            //       displayName: name.text);
-                            //}
+                          isEnabled: isEnabled,
+                          isLoading:
+                              state.registerLoadState == LoadState.loading,
+                          onTap: () {
+                            state.selectedInterest.isEmpty
+                                ? snack.showErrorSnackBar(
+                                    'Select at least 1 interest and continue 😉',
+                                  )
+                                : notifier.registerUser(
+                                    params: RegisterParams(
+                                      email: email.text,
+                                      password: password.text,
+                                      phone: phone.text,
+                                      userName: name.text,
+                                    ),
+                                  );
                           }),
-                      const Spacing.bigHeight(),
+                      const Spacing.mediumHeight(),
                       Text.rich(
                         TextSpan(
                           text: AppStrings.alreadyAccount,

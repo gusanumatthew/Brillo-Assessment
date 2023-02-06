@@ -7,8 +7,8 @@ import 'package:brilloconnetz_test/src/general_widgets/app_bottom_nav.dart';
 import 'package:flutter/material.dart';
 
 class DashboardView extends StatefulWidget {
-  //final AppUser user;
-  const DashboardView({super.key});
+  final AppUser user;
+  const DashboardView({super.key, required this.user});
   @override
   DashboardViewState createState() => DashboardViewState();
 }

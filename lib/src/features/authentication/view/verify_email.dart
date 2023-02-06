@@ -1,4 +1,5 @@
 import 'package:brilloconnetz_test/src/core/constants/strings.dart';
+import 'package:brilloconnetz_test/src/features/authentication/view_model/verify_email_notifier.dart';
 import 'package:brilloconnetz_test/src/general_widgets/app_button.dart';
 import 'package:brilloconnetz_test/src/general_widgets/spacing.dart';
 import 'package:brilloconnetz_test/src/general_widgets/two_colored_text.dart';
@@ -12,6 +13,7 @@ class VerifyEmailView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -57,11 +59,11 @@ class VerifyEmailView extends ConsumerWidget {
                       SizedBox(
                         width: 150,
                         child: AppButton(
-                            text: AppStrings.goToLogin, onTap: () {}
-                            //  async => await ref
-                            //     .read(verifyEmailNotifierProvider.notifier)
-                            //     .navigateToLogin(),
-                            ),
+                          text: AppStrings.goToLogin,
+                          onTap: () async => await ref
+                              .read(verifyEmailNotifierProvider.notifier)
+                              .navigateToLogin(),
+                        ),
                       )
                     ],
                   ),

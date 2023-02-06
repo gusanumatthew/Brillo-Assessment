@@ -1,6 +1,8 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:brilloconnetz_test/src/core/constants/colors.dart';
 import 'package:brilloconnetz_test/src/core/routes.dart';
+import 'package:brilloconnetz_test/src/repositories/auth_repository.dart';
+import 'package:brilloconnetz_test/src/repositories/user_repository.dart';
 import 'package:brilloconnetz_test/src/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,16 +23,15 @@ class _SplashViewState extends ConsumerState<SplashView> {
 
   void decideNavigation() async {
     await Future.delayed(const Duration(seconds: 2), () async {
-      // final user = ref.watch(authenticationRepository).currentUser;
-      // if (user == null) {
-      //   ref.read(navigationService).navigateOffNamed(Routes.login);
-      // } else {
-      //   final appUser =
-      //       await ref.watch(userRepository).getFutureUser(user.uid);
-      //   ref
-      //       .read(navigationService)
-      //       .navigateOffNamed(Routes.naija, arguments: appUser);
-      // }
+      final user = ref.watch(authenticationRepository).currentUser;
+      if (user == null) {
+        ref.read(navigationService).navigateOffNamed(Routes.login);
+      } else {
+        final appUser = await ref.watch(userRepository).getFutureUser(user.uid);
+        ref
+            .read(navigationService)
+            .navigateOffNamed(Routes.dashboard, arguments: appUser);
+      }
       ref.read(navigationService).navigateOffNamed(Routes.login);
     });
   }

@@ -34,6 +34,11 @@ extension ValidationExtension on BuildContext {
       value == null || value.length < 6
           ? "Password must have 6 or more characters"
           : null;
+
+  String? validatePhone(String? value, BuildContext context) =>
+      value == null || value.length < 10 || value.length > 11
+          ? "Invalid Phone"
+          : null;
 }
 
 extension StringExtension on String {

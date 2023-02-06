@@ -1,22 +1,26 @@
+import 'package:brilloconnetz_test/src/core/constants/colors.dart';
 import 'package:brilloconnetz_test/src/core/constants/strings.dart';
 import 'package:brilloconnetz_test/src/core/routes.dart';
+import 'package:brilloconnetz_test/src/core/utils/enums.dart';
 import 'package:brilloconnetz_test/src/core/utils/validation_extensions.dart';
+import 'package:brilloconnetz_test/src/features/authentication/view_model/login_notifier.dart';
 import 'package:brilloconnetz_test/src/general_widgets/app_button.dart';
 import 'package:brilloconnetz_test/src/general_widgets/app_text_field.dart';
 import 'package:brilloconnetz_test/src/general_widgets/spacing.dart';
 import 'package:brilloconnetz_test/src/general_widgets/two_colored_text.dart';
+import 'package:brilloconnetz_test/src/services/navigation_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LoginView extends ConsumerStatefulWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
   @override
   LoginViewState createState() => LoginViewState();
 }
 
-class LoginViewState extends ConsumerState<LoginView> {
+class LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -26,8 +30,7 @@ class LoginViewState extends ConsumerState<LoginView> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final height = MediaQuery.of(context).size.height;
-    // final state = ref.watch(loginProvider);
-    // final notifier = ref.read(loginProvider.notifier);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -73,32 +76,45 @@ class LoginViewState extends ConsumerState<LoginView> {
                         label: AppStrings.password,
                         hintText: '*******',
                         keyboardType: TextInputType.visiblePassword,
-                        // obscureText: state.obscureText,
                         validateFunction: (value) =>
                             context.validateFieldNotEmpty(value, context),
                         controller: password,
-                        // suffixIcon: IconButton(
-                        //   color: AppColors.deep,
-                        //   icon: Icon(
-                        //     state.obscureText
-                        //         ? Icons.visibility_off_outlined
-                        //         : Icons.visibility_outlined,
-                        //   ),
-                        //   onPressed: () => notifier.passwordVisibility(),
-                        // ),
+                      ),
+                      const Spacing.bigHeight(),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Consumer(builder: (context, ref, __) {
+                          return InkWell(
+                            onTap: () {
+                              ref
+                                  .read(navigationService)
+                                  .navigateToNamed(Routes.forgot);
+                            },
+                            child: Text(
+                              'Forgot Password ?',
+                              style: textTheme.headline4?.copyWith(
+                                color: AppColors.lightBlue,
+                              ),
+                            ),
+                          );
+                        }),
                       ),
                       const Spacing.largeHeight(),
-                      AppButton(
-                        text: 'Sign in',
-                        onTap: () {
-                          // FocusScope.of(context).unfocus();
-                          // if (_formKey.currentState!.validate()) {
-                          //   notifier.loginUser(
-                          //       email: email.text, password: password.text);
-                          Navigator.pushNamed(context, Routes.dashboard);
-                          // }
-                        },
-                      ),
+                      Consumer(builder: (context, ref, child) {
+                        final state = ref.watch(loginProvider);
+                        final notifier = ref.read(loginProvider.notifier);
+                        return AppButton(
+                          isLoading: state.loginLoadState == LoadState.loading,
+                          text: 'Sign in',
+                          onTap: () {
+                            FocusScope.of(context).unfocus();
+                            if (_formKey.currentState!.validate()) {
+                              notifier.loginUser(
+                                  email: email.text, password: password.text);
+                            }
+                          },
+                        );
+                      }),
                       const Spacing.bigHeight(),
                       Text.rich(
                         TextSpan(
