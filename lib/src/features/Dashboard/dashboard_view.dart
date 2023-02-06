@@ -48,11 +48,11 @@ class DashboardViewState extends State<DashboardView> {
       ),
       body: IndexedStack(
         index: currentIndex,
-        children: const [
-          BuddiesView(),
-          DiscoverView(),
-          SettingsView(),
-          ProfileView(),
+        children: [
+          const BuddiesView(),
+          const DiscoverView(),
+          const SettingsView(),
+          ProfileView(appUser: widget.user),
         ],
       ),
     );

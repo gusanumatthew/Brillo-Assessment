@@ -43,7 +43,7 @@ class RegisterViewState extends ConsumerState<RegisterView> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final height = MediaQuery.of(context).size.height;
+
     final state = ref.watch(registerProvider);
     final notifier = ref.read(registerProvider.notifier);
     final snack = ref.read(snackbarService);

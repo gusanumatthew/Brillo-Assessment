@@ -30,4 +30,5 @@ class AppStrings {
   static const oldPassword = 'Old Password';
   static const newPassword = 'New Password';
   static const updateProfile = 'Update Profile';
+  static const changeUsername = 'Change Username';
 }
